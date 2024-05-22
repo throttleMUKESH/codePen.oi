@@ -1,8 +1,8 @@
 import express from "express";
 import { loadCode, saveCode } from "../controllers/compilerController";
-const compilerRoute = express.Router();
+const compilerRouter = express.Router();
 
-compilerRoute.post("/save", saveCode);
-compilerRoute.post("/load", loadCode);
+compilerRouter.post("/save", saveCode);
+compilerRouter.post("/load", loadCode);
 
-export default compilerRoute;
+export default compilerRouter;

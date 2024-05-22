@@ -3,7 +3,9 @@ const app = express();
 import cors from "cors";
 import { config } from "dotenv";
 import { dbConnect } from "./lib/dbConnect";
-import compilerRoute from "./routes/compilerRoute";
+
+import compilerRouter from "./routes/compilerRoute";
+import userRouter from "./routes/userRoute";
 
 app.use(express.json());
 app.use(cors());
@@ -19,7 +21,8 @@ app.get("/", (req: Request, res: Response) => {
     })
 })
 
-app.use("/compiler", compilerRoute)
+app.use("/compiler", compilerRouter);
+app.use("/user", userRouter)
 
 app.listen(process.env.PORT, ()=> {
     console.log(`http://localhost: ${process.env.PORT}`);
