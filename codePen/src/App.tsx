@@ -1,27 +1,34 @@
 import "./App.css";
 
 import Header from "./components/Header";
-import { Route, Routes } from "react-router-dom";
-import Home from "./Pages/Home";
-import Compiler from "./Pages/Compiler";
-import NotFound from "./Pages/NotFound";
+
 import { ThemeProvider } from "@/components/theme-provider";
-import { Login } from "./Pages/Login";
-import { Signup } from "./Pages/Signup";
+
+import { Toaster } from "sonner";
+import { useGetUserDetailsQuery } from "./redux/slice/api";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateCurrentUser, updateisLoggedIn } from "./redux/slice/appSlice";
+import { AllRoutes } from "./AllRoutes";
 
 function App() {
+  const { data, error } = useGetUserDetailsQuery();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (data) {
+      dispatch(updateCurrentUser(data));
+      dispatch(updateisLoggedIn(true));
+    } else if (error) {
+      dispatch(updateCurrentUser({}));
+      dispatch(updateisLoggedIn(false));
+    }
+  }, [data, error]);
   return (
     <>
+      <Toaster position="bottom-right" theme="dark" />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/compiler" element={<Compiler />} />
-          <Route path="/compiler/:urlId" element={<Compiler />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AllRoutes />
       </ThemeProvider>
     </>
   );

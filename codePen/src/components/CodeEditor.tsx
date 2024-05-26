@@ -18,7 +18,7 @@ const CodeEditor = () => {
     (state: RootState) => state.compilerSlice.currentLanguage
   );
 
-  const onChange = React.useCallback((val: any) => {
+  const onChange = React.useCallback((val: string) => {
     dispatch(updateCodeValue(val));
   }, []);
 
@@ -26,6 +26,7 @@ const CodeEditor = () => {
     <ReactCodeMirror
       value={fullCode[currentLanguage].toString()}
       height="calc(100vh - 60px - 50px)"
+     
       extensions={[loadLanguage(currentLanguage)!]}
       onChange={onChange}
       theme={darculaInit({

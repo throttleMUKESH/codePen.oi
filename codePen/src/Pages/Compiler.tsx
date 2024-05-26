@@ -2,58 +2,63 @@ import CodeEditor from "@/components/CodeEditor";
 import HelperHeader from "@/components/HelperHeader";
 import RenderCode from "@/components/RenderCode";
 
-import { toast } from "sonner";
+
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { updateFullCode } from "@/redux/slice/compilerSlice";
-import { HanldeError } from "@/utils/HandleError";
-import axios from "axios";
+import { updateFullCode, updateIsOwner } from "@/redux/slice/compilerSlice";
+import { HandleError } from "@/utils/HandleError";
+
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 import { useParams } from "react-router-dom";
-
+import { useLoadCodeMutation } from "@/redux/slice/api";
+import Loader from "@/components/Loader/Loading";
 
 const Compiler = () => {
-  const dispatch = useDispatch()
-const {urlId} = useParams();
-const loadCode = async () => {
-  try {
-       const response = await axios.post("http://localhost:4000/compiler/load", {
-        urlId: urlId
-       })
-      
-     dispatch(updateFullCode(response.data.fullCode))
-  } catch(error) {
-    if(axios.isAxiosError(error)) {
-      if(error?.response?.status === 500) {
-        toast("Invalid URL, Default Code Loaded")
-      }
-    }
-    HanldeError(error)
-  }
-}
+  const [loadExistingCode, { isLoading }] = useLoadCodeMutation();
+  const dispatch = useDispatch();
+  const { urlId } = useParams();
+  const loadCode = async () => {
+    try {
+      if (urlId) {
+        const response = await loadExistingCode({ urlId }).unwrap();
 
-useEffect(() => {
-  if(urlId) {
-   loadCode();
+        dispatch(updateFullCode(response.fullCode));
+        dispatch(updateIsOwner(response.isOwner));
+      }
+    } catch (error) {
+      HandleError(error);
+    }
+  };
+
+  useEffect(() => {
+    if (urlId) {
+      loadCode();
+    }
+  }, [urlId]);
+
+  if(isLoading) {
+    return (
+      <div className="w-full  mt-96 flex justify-center items-center">
+        <Loader/>
+      </div>
+    )
   }
-}, [urlId])
   return (
-    <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel className="h-[calc(100vh-60px)] min-w-[350px]">
-        <HelperHeader/>
-        <CodeEditor/>
+    <ResizablePanelGroup direction="horizontal" >
+      <ResizablePanel className="h-[calc(100dvh-60px)] sm:full md:min-w-[150px]">
+        <HelperHeader />
+        <CodeEditor />
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel className="h-[calc(100vh-60px)]  min-w-[350px]">
+      <ResizablePanel className="h-[calc(100dvh-60px)] sm:full  md:min-w-[150px]">
         <RenderCode/>
       </ResizablePanel>
     </ResizablePanelGroup>
-     
   );
 };
 

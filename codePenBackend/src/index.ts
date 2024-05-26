@@ -2,15 +2,17 @@ import express, { Request, Response } from "express";
 const app = express();
 import cors from "cors";
 import { config } from "dotenv";
+import cookieParser from "cookie-parser"
 import { dbConnect } from "./lib/dbConnect";
 
 import compilerRouter from "./routes/compilerRoute";
 import userRouter from "./routes/userRoute";
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({credentials: true, origin:"http://localhost:5173" }));
 config();
 dbConnect();
+app.use(cookieParser())
 
 
 app.get("/", (req: Request, res: Response) => {
